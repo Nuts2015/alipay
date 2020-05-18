@@ -2,7 +2,7 @@ package alipay_test
 
 import (
 	"fmt"
-	"github.com/smartwalle/alipay/v3"
+	"github.com/Nuts2015/alipay/v3"
 	"os"
 )
 
