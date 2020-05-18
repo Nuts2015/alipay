@@ -1,18 +1,21 @@
 package alipay
 
-// FundTransToAccountTransfer 单笔转账到支付宝账户接口 https://docs.open.alipay.com/api_28/alipay.fund.trans.toaccount.transfer
+// FundTransToAccountTransfer https://docs.open.alipay.com/api_28/alipay.fund.trans.toaccount.transfer
+// 单笔转账到支付宝账户接口
 func (this *Client) FundTransToAccountTransfer(param FundTransToAccountTransfer) (result *FundTransToAccountTransferRsp, err error) {
 	err = this.doRequest("POST", param, &result)
 	return result, err
 }
 
-// FundTransOrderQuery 查询转账订单接口 https://docs.open.alipay.com/api_28/alipay.fund.trans.order.query/
+// FundTransOrderQuery https://docs.open.alipay.com/api_28/alipay.fund.trans.order.query/
+// 查询转账订单接口
 func (this *Client) FundTransOrderQuery(param FundTransOrderQuery) (result *FundTransOrderQueryRsp, err error) {
 	err = this.doRequest("POST", param, &result)
 	return result, err
 }
 
-// FundAuthOrderVoucherCreate 资金授权发码接口 https://docs.open.alipay.com/api_28/alipay.fund.auth.order.voucher.create/
+// FundAuthOrderVoucherCreate https://docs.open.alipay.com/api_28/alipay.fund.auth.order.voucher.create/
+// 资金授权发码接口
 func (this *Client) FundAuthOrderVoucherCreate(param FundAuthOrderVoucherCreate) (result *FundAuthOrderVoucherCreateRsp, err error) {
 	err = this.doRequest("POST", param, &result)
 	return result, err
@@ -49,22 +52,4 @@ func (this *Client) FundAuthOrderAppFreeze(param FundAuthOrderAppFreeze) (result
 		return "", err
 	}
 	return p.Encode(), err
-}
-
-// FundTransUniTransfer 单笔转账接口 https://docs.open.alipay.com/api_28/alipay.fund.trans.uni.transfer/
-func (this *Client) FundTransUniTransfer(param FundTransUniTransfer) (result *FundTransUniTransferRsp, err error) {
-	err = this.doRequest("POST", param, &result)
-	return result, err
-}
-
-// FundTransCommonQuery 转账业务单据查询接口 https://docs.open.alipay.com/api_28/alipay.fund.trans.common.query/
-func (this *Client) FundTransCommonQuery(param FundTransCommonQuery) (result *FundTransCommonQueryRsp, err error) {
-	err = this.doRequest("POST", param, &result)
-	return result, err
-}
-
-// FundAccountQuery 支付宝资金账户资产查询接口  https://docs.open.alipay.com/api_28/alipay.fund.account.query
-func (this *Client) FundAccountQuery(param FundAccountQuery) (result *FundAccountQueryRsp, err error) {
-	err = this.doRequest("POST", param, &result)
-	return result, err
 }

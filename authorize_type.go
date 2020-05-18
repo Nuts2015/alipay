@@ -10,7 +10,8 @@ const (
 	kSandboxAppToAppAuth    = "https://openauth.alipaydev.com/oauth2/appToAppAuth.htm"
 )
 
-// SystemOauthToken 换取授权访问令牌接口请求参数 https://docs.open.alipay.com/api_9/alipay.system.oauth.token
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_9/alipay.system.oauth.token
 type SystemOauthToken struct {
 	AppAuthToken string `json:"-"` // 可选
 	GrantType    string `json:"-"` // 值为 authorization_code 时，代表用code换取；值为refresh_token时，代表用refresh_token换取
@@ -35,10 +36,9 @@ func (this SystemOauthToken) Params() map[string]string {
 	return m
 }
 
-// SystemOauthTokenRsp 换取授权访问令牌接口请求参数
 type SystemOauthTokenRsp struct {
 	Content struct {
-		Code         Code   `json:"code"`
+		Code         string `json:"code"`
 		Msg          string `json:"msg"`
 		SubCode      string `json:"sub_code"`
 		SubMsg       string `json:"sub_msg"`
@@ -57,7 +57,8 @@ type SystemOauthTokenRsp struct {
 	Sign string `json:"sign"`
 }
 
-// UserInfoShare 支付宝会员授权信息查询接口请求参数 https://docs.open.alipay.com/api_2/alipay.user.info.share
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_2/alipay.user.info.share
 type UserInfoShare struct {
 	AppAuthToken string `json:"-"` // 可选
 	AuthToken    string `json:"-"` // 是
@@ -74,10 +75,9 @@ func (this UserInfoShare) Params() map[string]string {
 	return m
 }
 
-// UserInfoShareRsp 支付宝会员授权信息查询接口响应参数
 type UserInfoShareRsp struct {
 	Content struct {
-		Code               Code   `json:"code"`
+		Code               string `json:"code"`
 		Msg                string `json:"msg"`
 		SubCode            string `json:"sub_code"`
 		SubMsg             string `json:"sub_msg"`
@@ -96,7 +96,8 @@ type UserInfoShareRsp struct {
 	Sign string `json:"sign"`
 }
 
-// OpenAuthTokenApp 换取应用授权令牌请求参数 https://docs.open.alipay.com/api_9/alipay.open.auth.token.app
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_9/alipay.open.auth.token.app
 type OpenAuthTokenApp struct {
 	GrantType    string `json:"grant_type"` // 值为 authorization_code 时，代表用code换取；值为refresh_token时，代表用refresh_token换取
 	Code         string `json:"code"`
@@ -119,45 +120,18 @@ func (this OpenAuthTokenApp) Params() map[string]string {
 	return m
 }
 
-// OpenAuthTokenAppRsp 换取应用授权令牌响应参数 新版返回值 参见https://opendocs.alipay.com/open/20160728150111277227/intro
 type OpenAuthTokenAppRsp struct {
 	Content struct {
-		Code   Code             `json:"code"`
-		Msg    string           `json:"msg"`
-		Tokens []*OpenAuthToken `json:"tokens"`
+		Code            string `json:"code"`
+		Msg             string `json:"msg"`
+		SubCode         string `json:"sub_code"`
+		SubMsg          string `json:"sub_msg"`
+		AppAuthToken    string `json:"app_auth_token"`
+		UserId          string `json:"user_id"`
+		AuthAppId       string `json:"auth_app_id"`
+		ExpiresIn       int64  `json:"expires_in"`
+		ReExpiresIn     int64  `json:"re_expires_in"`
+		AppRefreshToken string `json:"app_refresh_token"`
 	} `json:"alipay_open_auth_token_app_response"`
 	Sign string `json:"sign"`
-}
-
-type OpenAuthToken struct {
-	AppAuthToken    string `json:"app_auth_token"`    // 授权令牌信息
-	AppRefreshToken string `json:"app_refresh_token"` // 令牌信息
-	AuthAppId       string `json:"auth_app_id"`       // 授权方应用id
-	ExpiresIn       int64  `json:"expires_in"`        // 令牌有效期
-	ReExpiresIn     int64  `json:"re_expires_in"`     // 有效期
-	UserId          string `json:"user_id"`           // 支付宝用户标识
-}
-
-// AccountAuth 支付宝登录时, 帮客户端做参数签名, 返回授权请求信息字串接口请求参数 https://docs.open.alipay.com/218/105327/
-type AccountAuth struct {
-	Pid      string `json:"pid"`
-	TargetId string `json:"target_id"`
-	AuthType string `json:"auth_type"`
-}
-
-func (this AccountAuth) APIName() string {
-	return "alipay.open.auth.sdk.code.get"
-}
-
-func (this AccountAuth) Params() map[string]string {
-	var m = make(map[string]string)
-	m["apiname"] = "com.alipay.account.auth"
-	m["app_name"] = "mc"
-	m["biz_type"] = "openservice"
-	m["pid"] = this.Pid
-	m["product_id"] = "APP_FAST_LOGIN"
-	m["scope"] = "kuaijie"
-	m["target_id"] = this.TargetId
-	m["auth_type"] = this.AuthType
-	return m
 }

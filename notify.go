@@ -60,9 +60,6 @@ func (this *Client) GetTradeNotification(req *http.Request) (noti *TradeNotifica
 	if req == nil {
 		return nil, errors.New("request 参数不能为空")
 	}
-	if err = req.ParseForm(); err != nil {
-		return nil, err
-	}
 
 	noti = &TradeNotification{}
 	noti.AppId = req.FormValue("app_id")
@@ -71,7 +68,7 @@ func (this *Client) GetTradeNotification(req *http.Request) (noti *TradeNotifica
 	noti.NotifyType = req.FormValue("notify_type")
 	noti.NotifyTime = req.FormValue("notify_time")
 	noti.TradeNo = req.FormValue("trade_no")
-	noti.TradeStatus = TradeStatus(req.FormValue("trade_status"))
+	noti.TradeStatus = req.FormValue("trade_status")
 	noti.TotalAmount = req.FormValue("total_amount")
 	noti.ReceiptAmount = req.FormValue("receipt_amount")
 	noti.InvoiceAmount = req.FormValue("invoice_amount")
@@ -98,9 +95,9 @@ func (this *Client) GetTradeNotification(req *http.Request) (noti *TradeNotifica
 	noti.PassbackParams = req.FormValue("passback_params")
 	noti.VoucherDetailList = req.FormValue("voucher_detail_list")
 
-	//if len(noti.NotifyId) == 0 {
-	//	return nil, errors.New("不是有效的 Notify")
-	//}
+	if len(noti.NotifyId) == 0 {
+		return nil, errors.New("不是有效的 Notify")
+	}
 
 	ok, err := this.VerifySign(req.Form)
 	if ok == false {

@@ -22,69 +22,59 @@ import (
 )
 
 var (
-	ErrSignNotFound         = errors.New("alipay: sign content not found")
-	ErrAliPublicKeyNotFound = errors.New("alipay: alipay public key not found")
-)
-
-const (
-	kAliPayPublicKeySN = "alipay-public-key"
-	kAppAuthToken      = "app_auth_token"
+	kSignNotFound         = errors.New("alipay: sign content not found")
+	kAliPublicKeyNotFound = errors.New("alipay: alipay public key not found")
 )
 
 type Client struct {
-	mu                 sync.Mutex
 	isProduction       bool
 	appId              string
 	apiDomain          string
 	notifyVerifyDomain string
+	appPrivateKey      *rsa.PrivateKey // 应用私钥
+	aliPublicKey       *rsa.PublicKey  // 支付宝公钥
 	Client             *http.Client
-	location           *time.Location
 
-	appPrivateKey    *rsa.PrivateKey // 应用私钥
 	appCertSN        string
 	rootCertSN       string
 	aliPublicCertSN  string
 	aliPublicKeyList map[string]*rsa.PublicKey
+
+	mu *sync.Mutex
 }
 
-type OptionFunc func(c *Client)
-
-func WithTimeLocation(location *time.Location) OptionFunc {
-	return func(c *Client) {
-		c.location = location
-	}
-}
-
-func WithHTTPClient(client *http.Client) OptionFunc {
-	return func(c *Client) {
-		c.Client = client
-	}
-}
+var AlipayClient *Client
 
 // New 初始化支付宝客户端
-//
 // appId - 支付宝应用 id
-//
+// aliPublicKey - 支付宝公钥，创建支付宝应用之后，从支付宝后台获取
 // privateKey - 应用私钥，开发者自己生成
-//
 // isProduction - 是否为生产环境，传 false 的时候为沙箱环境，用于开发测试，正式上线的时候需要改为 true
-func New(appId, privateKey string, isProduction bool, opts ...OptionFunc) (client *Client, err error) {
-	location, err := time.LoadLocation("Asia/Chongqing")
+func New(appId, aliPublicKey, privateKey string, isProduction bool) (client *Client, err error) {
+	pri, err := crypto4go.ParsePKCS1PrivateKey(crypto4go.FormatPKCS1PrivateKey(privateKey))
 	if err != nil {
-		return nil, err
-	}
-
-	priKey, err := crypto4go.ParsePKCS1PrivateKey(crypto4go.FormatPKCS1PrivateKey(privateKey))
-	if err != nil {
-		priKey, err = crypto4go.ParsePKCS8PrivateKey(crypto4go.FormatPKCS8PrivateKey(privateKey))
+		pri, err = crypto4go.ParsePKCS8PrivateKey(crypto4go.FormatPKCS8PrivateKey(privateKey))
 		if err != nil {
 			return nil, err
 		}
 	}
+
+	var pub *rsa.PublicKey
+	if len(aliPublicKey) > 0 && isProduction == false {
+		pub, err = crypto4go.ParsePublicKey(crypto4go.FormatPublicKey(aliPublicKey))
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	client = &Client{}
 	client.isProduction = isProduction
 	client.appId = appId
+	client.appPrivateKey = pri
+	client.aliPublicKey = pub
+	client.mu = &sync.Mutex{}
 
+	client.Client = http.DefaultClient
 	if client.isProduction {
 		client.apiDomain = kProductionURL
 		client.notifyVerifyDomain = kProductionMAPIURL
@@ -92,39 +82,12 @@ func New(appId, privateKey string, isProduction bool, opts ...OptionFunc) (clien
 		client.apiDomain = kSandboxURL
 		client.notifyVerifyDomain = kSandboxURL
 	}
-	client.Client = http.DefaultClient
-	client.location = location
-
-	client.appPrivateKey = priKey
 	client.aliPublicKeyList = make(map[string]*rsa.PublicKey)
-
-	for _, opt := range opts {
-		opt(client)
-	}
-
 	return client, nil
 }
 
 func (this *Client) IsProduction() bool {
 	return this.isProduction
-}
-
-// LoadAliPayPublicKey 加载支付宝公钥
-func (this *Client) LoadAliPayPublicKey(aliPublicKey string) error {
-	var pub *rsa.PublicKey
-	var err error
-	if len(aliPublicKey) < 0 {
-		return ErrAliPublicKeyNotFound
-	}
-	pub, err = crypto4go.ParsePublicKey(crypto4go.FormatPublicKey(aliPublicKey))
-	if err != nil {
-		return err
-	}
-	this.mu.Lock()
-	this.aliPublicCertSN = kAliPayPublicKeySN
-	this.aliPublicKeyList[this.aliPublicCertSN] = pub
-	this.mu.Unlock()
-	return nil
 }
 
 // LoadAppPublicCert 加载应用公钥证书
@@ -164,6 +127,9 @@ func (this *Client) LoadAliPayPublicCert(s string) error {
 	this.aliPublicKeyList[this.aliPublicCertSN] = key
 	this.mu.Unlock()
 
+	if this.aliPublicKey == nil {
+		this.aliPublicKey = key
+	}
 	return nil
 }
 
@@ -214,7 +180,7 @@ func (this *Client) URLValues(param Param) (value url.Values, err error) {
 	p.Add("format", kFormat)
 	p.Add("charset", kCharset)
 	p.Add("sign_type", kSignTypeRSA2)
-	p.Add("timestamp", time.Now().In(this.location).Format(kTimeFormat))
+	p.Add("timestamp", time.Now().Format(kTimeFormat))
 	p.Add("version", kVersion)
 	if this.appCertSN != "" {
 		p.Add("app_cert_sn", this.appCertSN)
@@ -232,9 +198,6 @@ func (this *Client) URLValues(param Param) (value url.Values, err error) {
 	var ps = param.Params()
 	if ps != nil {
 		for key, value := range ps {
-			if key == kAppAuthToken && value == "" {
-				continue
-			}
 			p.Add(key, value)
 		}
 	}
@@ -296,11 +259,11 @@ func (this *Client) doRequest(method string, param Param, result interface{}) (e
 			}
 
 			// alipay.open.app.alipaycert.download(应用支付宝公钥证书下载) 没有返回 sign 字段，所以再判断一次 code
-			if errRsp.Code != CodeSuccess {
+			if errRsp.Code != K_SUCCESS_CODE {
 				if errRsp != nil {
 					return errRsp
 				}
-				return ErrSignNotFound
+				return kSignNotFound
 			}
 		}
 	} else if errorIndex > 0 {
@@ -313,7 +276,7 @@ func (this *Client) doRequest(method string, param Param, result interface{}) (e
 			return errRsp
 		}
 	} else {
-		return ErrSignNotFound
+		return kSignNotFound
 	}
 
 	if sign != "" {
@@ -341,6 +304,10 @@ func (this *Client) DoRequest(method string, param Param, result interface{}) (e
 
 func (this *Client) VerifySign(data url.Values) (ok bool, err error) {
 	var certSN = data.Get(kCertSNNodeName)
+	if certSN == "" {
+		certSN = this.aliPublicCertSN
+	}
+
 	publicKey, err := this.getAliPayPublicKey(certSN)
 	if err != nil {
 		return false, err
@@ -353,11 +320,13 @@ func (this *Client) getAliPayPublicKey(certSN string) (key *rsa.PublicKey, err e
 	this.mu.Lock()
 	defer this.mu.Unlock()
 
-	if certSN == "" {
-		certSN = this.aliPublicCertSN
-	}
-
 	key = this.aliPublicKeyList[certSN]
+
+	if this.isProduction {
+		key = this.aliPublicKeyList[certSN]
+	} else {
+		key = this.aliPublicKey
+	}
 
 	if key == nil {
 		if this.isProduction {
@@ -369,10 +338,10 @@ func (this *Client) getAliPayPublicKey(certSN string) (key *rsa.PublicKey, err e
 			var ok bool
 			key, ok = cert.PublicKey.(*rsa.PublicKey)
 			if ok == false {
-				return nil, ErrAliPublicKeyNotFound
+				return nil, kAliPublicKeyNotFound
 			}
 		} else {
-			return nil, ErrAliPublicKeyNotFound
+			return nil, kAliPublicKeyNotFound
 		}
 	}
 	return key, nil
@@ -407,6 +376,10 @@ func (this *Client) downloadAliPayCert(certSN string) (cert *x509.Certificate, e
 
 	this.aliPublicCertSN = getCertSN(cert)
 	this.aliPublicKeyList[this.aliPublicCertSN] = key
+
+	if this.aliPublicKey == nil {
+		this.aliPublicKey = key
+	}
 
 	return cert, nil
 }

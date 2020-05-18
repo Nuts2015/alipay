@@ -1,9 +1,8 @@
 package alipay_test
 
 import (
-	"testing"
-
 	"github.com/smartwalle/alipay/v3"
+	"testing"
 )
 
 func TestClient_PublicAppAuthorize(t *testing.T) {
@@ -21,7 +20,7 @@ func TestClient_SystemOauthToken(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if rsp.Content.Code != alipay.CodeSuccess {
+	if rsp.Content.Code != alipay.K_SUCCESS_CODE {
 		t.Fatal(rsp.Content.Msg, rsp.Content.SubMsg)
 	}
 	t.Log(rsp.Content.UserId, rsp.Content.AccessToken)
@@ -35,7 +34,7 @@ func TestClient_UserInfoShare(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if rsp.Content.Code != alipay.CodeSuccess {
+	if rsp.Content.Code != alipay.K_SUCCESS_CODE {
 		t.Fatal(rsp.Content.Msg, rsp.Content.SubMsg)
 	}
 	t.Log(rsp.Content.UserId)
@@ -56,27 +55,8 @@ func TestClient_OpenAuthTokenApp(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if rsp.Content.Code != alipay.CodeSuccess {
-		t.Fatal(rsp.Content.Msg)
+	if rsp.Content.Code != alipay.K_SUCCESS_CODE {
+		t.Fatal(rsp.Content.Msg, rsp.Content.SubMsg)
 	}
-	tokens := rsp.Content.Tokens
-	for _, token := range tokens {
-		t.Log(token.AppAuthToken, token.UserId)
-	}
-}
-
-func TestClient_AccountAuth(t *testing.T) {
-	t.Log("========== AccountAuth ==========")
-	var p = alipay.AccountAuth{}
-	p.Pid = "2088123456789012"
-	p.TargetId = "kkkkk091125"
-	p.AuthType = "AUTHACCOUNT"
-	result, err := client.AccountAuth(p)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == "" {
-		t.Fatal(err)
-	}
-	t.Log(result)
+	t.Log(rsp.Content.AppAuthToken, rsp.Content.UserId)
 }

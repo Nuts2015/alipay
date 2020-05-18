@@ -1,6 +1,8 @@
 package alipay
 
-// FundTransToAccountTransfer 单笔转账到支付宝账户接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.trans.toaccount.transfer
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_28/alipay.fund.trans.toaccount.transfer
+// 单笔转账到支付宝账户接口请求结构
 type FundTransToAccountTransfer struct {
 	AppAuthToken  string `json:"-"`               // 可选
 	OutBizNo      string `json:"out_biz_no"`      // 必选 商户转账唯一订单号
@@ -22,10 +24,10 @@ func (this FundTransToAccountTransfer) Params() map[string]string {
 	return m
 }
 
-// FundTransToAccountTransferRsp 单笔转账到支付宝账户接口响应参数
+// 单笔转账到支付宝账户接口响应参数
 type FundTransToAccountTransferRsp struct {
 	Content struct {
-		Code     Code   `json:"code"`
+		Code     string `json:"code"`
 		Msg      string `json:"msg"`
 		SubCode  string `json:"sub_code"`
 		SubMsg   string `json:"sub_msg"`
@@ -37,13 +39,15 @@ type FundTransToAccountTransferRsp struct {
 }
 
 func (this *FundTransToAccountTransferRsp) IsSuccess() bool {
-	if this.Content.Code == CodeSuccess {
+	if this.Content.Code == K_SUCCESS_CODE {
 		return true
 	}
 	return false
 }
 
-// FundTransOrderQuery 查询转账订单接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.trans.order.query/
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_28/alipay.fund.trans.order.query/
+// 查询转账订单接口请求参数
 type FundTransOrderQuery struct {
 	AppAuthToken string `json:"-"`                    // 可选
 	OutBizNo     string `json:"out_biz_no,omitempty"` // 与 OrderId 二选一
@@ -60,10 +64,10 @@ func (this FundTransOrderQuery) Params() map[string]string {
 	return m
 }
 
-// FundTransOrderQueryRsp 查询转账订单接口响应参数
+// 查询转账订单接口响应参数
 type FundTransOrderQueryRsp struct {
 	Content struct {
-		Code           Code   `json:"code"`
+		Code           string `json:"code"`
 		Msg            string `json:"msg"`
 		SubCode        string `json:"sub_code"`
 		SubMsg         string `json:"sub_msg"`
@@ -80,13 +84,15 @@ type FundTransOrderQueryRsp struct {
 }
 
 func (this *FundTransOrderQueryRsp) IsSuccess() bool {
-	if this.Content.Code == CodeSuccess {
+	if this.Content.Code == K_SUCCESS_CODE {
 		return true
 	}
 	return false
 }
 
-// FundAuthOrderVoucherCreate 资金授权发码接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.auth.order.voucher.create/
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_28/alipay.fund.auth.order.voucher.create/
+// 资金授权发码接口
 type FundAuthOrderVoucherCreate struct {
 	NotifyURL         string `json:"-"`
 	AppAuthToken      string `json:"-"`                             // 可选
@@ -115,10 +121,9 @@ func (this FundAuthOrderVoucherCreate) Params() map[string]string {
 	return m
 }
 
-// FundAuthOrderVoucherCreateRsp 资金授权发码接口响应参数
 type FundAuthOrderVoucherCreateRsp struct {
 	Content struct {
-		Code         Code   `json:"code"`
+		Code         string `json:"code"`
 		Msg          string `json:"msg"`
 		SubCode      string `json:"sub_code"`
 		SubMsg       string `json:"sub_msg"`
@@ -131,7 +136,9 @@ type FundAuthOrderVoucherCreateRsp struct {
 	Sign string `json:"sign"`
 }
 
-// FundAuthOrderFreeze 资金授权冻结接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.auth.order.freeze/
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_28/alipay.fund.auth.order.freeze/
+// 资金授权冻结接口
 type FundAuthOrderFreeze struct {
 	NotifyURL    string `json:"-"`
 	AppAuthToken string `json:"-"`                        // 可选
@@ -159,10 +166,9 @@ func (this FundAuthOrderFreeze) Params() map[string]string {
 	return m
 }
 
-// FundAuthOrderFreezeRsp 资金授权冻结接口响应参数
 type FundAuthOrderFreezeRsp struct {
 	Content struct {
-		Code         Code   `json:"code"`
+		Code         string `json:"code"`
 		Msg          string `json:"msg"`
 		SubCode      string `json:"sub_code"`
 		SubMsg       string `json:"sub_msg"`
@@ -178,7 +184,9 @@ type FundAuthOrderFreezeRsp struct {
 	Sign string `json:"sign"`
 }
 
-// FundAuthOrderUnfreeze 资金授权解冻接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.auth.order.unfreeze/
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_28/alipay.fund.auth.order.unfreeze/
+// 资金授权解冻接口
 type FundAuthOrderUnfreeze struct {
 	NotifyURL    string `json:"-"`
 	AuthNo       string `json:"auth_no"`               // 必选,支付宝资金授权订单号,支付宝冻结时返回的交易号，数字格式 2016101210002001810258115912
@@ -200,10 +208,9 @@ func (this FundAuthOrderUnfreeze) Params() map[string]string {
 	return m
 }
 
-// FundAuthOrderUnfreezeRsp 资金授权解冻接口响应参数
 type FundAuthOrderUnfreezeRsp struct {
 	Content struct {
-		Code         Code   `json:"code"`
+		Code         string `json:"code"`
 		Msg          string `json:"msg"`
 		SubCode      string `json:"sub_code"`
 		SubMsg       string `json:"sub_msg"`
@@ -220,7 +227,9 @@ type FundAuthOrderUnfreezeRsp struct {
 	Sign string `json:"sign"`
 }
 
-// FundAuthOperationCancel 资金授权撤销接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.auth.operation.cancel/
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_28/alipay.fund.auth.operation.cancel/
+// 资金授权撤销接口
 type FundAuthOperationCancel struct {
 	NotifyURL    string `json:"-"`
 	AppAuthToken string `json:"-"`                        // 可选
@@ -242,10 +251,9 @@ func (this FundAuthOperationCancel) Params() map[string]string {
 	return m
 }
 
-// FundAuthOperationCancelRsp 资金授权撤销接口响应参数
 type FundAuthOperationCancelRsp struct {
 	Content struct {
-		Code         Code   `json:"code"`
+		Code         string `json:"code"`
 		Msg          string `json:"msg"`
 		SubCode      string `json:"sub_code"`
 		SubMsg       string `json:"sub_msg"`
@@ -258,7 +266,9 @@ type FundAuthOperationCancelRsp struct {
 	Sign string `json:"sign"`
 }
 
-// FundAuthOperationDetailQuery 资金授权操作查询接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.auth.operation.detail.query/
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_28/alipay.fund.auth.operation.detail.query/
+// 资金授权操作查询接口
 type FundAuthOperationDetailQuery struct {
 	AppAuthToken string `json:"-"`              // 可选
 	AuthNo       string `json:"auth_no"`        // 特殊可选, 支付宝授权资金订单号，与商户的授权资金订单号不能同时为空，二者都存在时，以支付宝资金授权订单号为准，该参数与支付宝授权资金操作流水号配对使用。
@@ -277,13 +287,8 @@ func (this FundAuthOperationDetailQuery) Params() map[string]string {
 	return m
 }
 
-// FundAuthOperationDetailQueryRsp 资金授权操作查询接口响应参数
 type FundAuthOperationDetailQueryRsp struct {
 	Content struct {
-		Code                    Code   `json:"code"`
-		Msg                     string `json:"msg"`
-		SubCode                 string `json:"sub_code"`
-		SubMsg                  string `json:"sub_msg"`
 		AuthNo                  string `json:"auth_no"`
 		OutOrderNo              string `json:"out_order_no"`
 		TotalFreezeAmount       string `json:"total_freeze_amount"`
@@ -315,7 +320,9 @@ type FundAuthOperationDetailQueryRsp struct {
 	Sign string `json:"sign"`
 }
 
-// FundAuthOrderAppFreeze 线上资金授权冻结接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.auth.order.app.freeze
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_28/alipay.fund.auth.order.app.freeze
+// 线上资金授权冻结接口请求参数
 type FundAuthOrderAppFreeze struct {
 	NotifyURL         string `json:"-"`
 	AppAuthToken      string `json:"-"`                             // 可选
@@ -344,10 +351,9 @@ func (this FundAuthOrderAppFreeze) Params() map[string]string {
 	return m
 }
 
-// FundAuthOrderAppFreezeRsp 线上资金授权冻结接口响应参数
 type FundAuthOrderAppFreezeRsp struct {
 	Content struct {
-		Code         Code   `json:"code"`
+		Code         string `json:"code"`
 		Msg          string `json:"msg"`
 		SubCode      string `json:"sub_code"`
 		SubMsg       string `json:"sub_msg"`
@@ -364,156 +370,4 @@ type FundAuthOrderAppFreezeRsp struct {
 		FundAmount   string `json:"fund_amount"`
 	} `json:"alipay_fund_auth_order_app_freeze_response"`
 	Sign string `json:"sign"`
-}
-
-// FundTransUniTransfer 单笔转账接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.trans.uni.transfer/
-type FundTransUniTransfer struct {
-	AppAuthToken    string     `json:"-"`                 // 可选
-	OutBizNo        string     `json:"out_biz_no"`        // 必选 商户端的唯一订单号，对于同一笔转账请求，商户需保证该订单号唯一。
-	TransAmount     string     `json:"trans_amount"`      // 必选 订单总金额，单位为元，精确到小数点后两位，STD_RED_PACKET 产品取值范围[0.01,100000000]； TRANS_ACCOUNT_NO_PWD产品取值范围[0.1,100000000]
-	ProductCode     string     `json:"product_code"`      // 必选 业务产品码， 收发现金红包固定为：STD_RED_PACKET； 单笔无密转账到支付宝账户固定为：TRANS_ACCOUNT_NO_PWD； 单笔无密转账到银行卡固定为：TRANS_BANKCARD_NO_PWD
-	BizScene        string     `json:"biz_scene"`         // 可选 描述特定的业务场景，可传的参数如下： PERSONAL_COLLECTION：C2C现金红包-领红包； DIRECT_TRANSFER：B2C现金红包、单笔无密转账到支付宝/银行卡
-	OrderTitle      string     `json:"order_title"`       // 可选 转账业务的标题，用于在支付宝用户的账单里显示
-	OriginalOrderId string     `json:"original_order_id"` // 可选 原支付宝业务单号。C2C现金红包-红包领取时，传红包支付时返回的支付宝单号；B2C现金红包、单笔无密转账到支付宝/银行卡不需要该参数。
-	PayeeInfo       *PayeeInfo `json:"payee_info"`        // 必选 收款方信息
-	Remark          string     `json:"remark"`            // 可选 业务备注
-	BusinessParams  string     `json:"business_params"`   // 可选 转账业务请求的扩展参数，支持传入的扩展参数如下： 1、sub_biz_scene 子业务场景，红包业务必传，取值REDPACKET，C2C现金红包、B2C现金红包均需传入； 2、withdraw_timeliness为转账到银行卡的预期到账时间，可选（不传入则默认为T1），取值T0表示预期T+0到账，取值T1表示预期T+1到账，因到账时效受银行机构处理影响，支付宝无法保证一定是T0或者T1到账；
-}
-
-func (this FundTransUniTransfer) APIName() string {
-	return "alipay.fund.trans.uni.transfer"
-}
-
-func (this FundTransUniTransfer) Params() map[string]string {
-	var m = make(map[string]string)
-	m["app_auth_token"] = this.AppAuthToken
-	return m
-}
-
-type PayeeInfo struct {
-	Identity     string `json:"identity"`      // 必填 参与方的唯一标识
-	IdentityType string `json:"identity_type"` // 必填 参与方的标识类型，目前支持如下类型： 1、ALIPAY_USER_ID 支付宝的会员ID 2、ALIPAY_LOGON_ID：支付宝登录号，支持邮箱和手机号格式
-	Name         string `json:"name"`          // 可选 参与方真实姓名，如果非空，将校验收款支付宝账号姓名一致性。当identity_type=ALIPAY_LOGON_ID时，本字段必填。
-}
-
-// FundTransUniTransferRsp 单笔转账接口响应参数
-type FundTransUniTransferRsp struct {
-	Content struct {
-		Code           Code   `json:"code"`
-		Msg            string `json:"msg"`
-		SubCode        string `json:"sub_code"`
-		SubMsg         string `json:"sub_msg"`
-		OutBizNo       string `json:"out_biz_no"`        // 用户订单号
-		OrderId        string `json:"order_id"`          // 支付宝转账订单号
-		PayFundOrderId string `json:"pay_fund_order_id"` // 支付宝支付资金流水号
-		Status         string `json:"status"`            // 转账单据状态。 SUCCESS：成功（对转账到银行卡的单据, 该状态可能变为退票[REFUND]状态）； FAIL：失败（具体失败原因请参见error_code以及fail_reason返回值）； DEALING：处理中； REFUND：退票；
-		TransDate      string `json:"trans_date"`        // 订单支付时间，格式为yyyy-MM-dd HH:mm:ss
-	} `json:"alipay_fund_trans_uni_transfer_response"`
-	Sign string `json:"sign"`
-}
-
-func (this *FundTransUniTransferRsp) IsSuccess() bool {
-	if this.Content.Code == CodeSuccess {
-		return true
-	}
-	return false
-}
-
-// FundTransCommonQuery 转账业务单据查询接口请求参数 https://docs.open.alipay.com/api_28/alipay.fund.trans.common.query/
-type FundTransCommonQuery struct {
-	AppAuthToken   string `json:"-"`                 // 可选
-	ProductCode    string `json:"product_code"`      // 必选 业务产品码， 收发现金红包固定为：STD_RED_PACKET； 单笔无密转账到支付宝账户固定为：TRANS_ACCOUNT_NO_PWD； 单笔无密转账到银行卡固定为：TRANS_BANKCARD_NO_PWD
-	BizScene       string `json:"biz_scene"`         // 必选 描述特定的业务场景，可传的参数如下： PERSONAL_COLLECTION：C2C现金红包-领红包； DIRECT_TRANSFER：B2C现金红包、单笔无密转账到支付宝/银行卡
-	OutBizNo       string `json:"out_biz_no"`        // 可选 商户端的唯一订单号，对于同一笔转账请求，商户需保证该订单号唯一。
-	OrderId        string `json:"order_id"`          // 可选 支付宝转账单据号
-	PayFundOrderId string `json:"pay_fund_order_id"` // 可选 支付宝支付资金流水号
-}
-
-func (this FundTransCommonQuery) APIName() string {
-	return "alipay.fund.trans.common.query"
-}
-
-func (this FundTransCommonQuery) Params() map[string]string {
-	var m = make(map[string]string)
-	m["app_auth_token"] = this.AppAuthToken
-	return m
-}
-
-// FundTransCommonQueryRsp 转账业务单据查询接口响应参数
-type FundTransCommonQueryRsp struct {
-	Content struct {
-		Code             Code   `json:"code"`
-		Msg              string `json:"msg"`
-		SubCode          string `json:"sub_code"`
-		SubMsg           string `json:"sub_msg"`
-		OrderId          string `json:"order_id"`           // 支付宝转账订单号
-		PayFundOrderId   string `json:"pay_fund_order_id"`  // 支付宝支付资金流水号
-		OutBizNo         string `json:"out_biz_no"`         // 用户订单号
-		TransAmount      string `json:"trans_amount"`       // 付款金额
-		Status           string `json:"status"`             // 转账单据状态。 SUCCESS：成功（对转账到银行卡的单据, 该状态可能变为退票[REFUND]状态）； FAIL：失败（具体失败原因请参见error_code以及fail_reason返回值）； DEALING：处理中； REFUND：退票；
-		PayDate          string `json:"pay_date"`           // 支付时间
-		ArrivalTimeEnd   string `json:"arrival_time_end"`   // 预计到账时间
-		OrderFee         string `json:"order_fee"`          // 预计收费金额
-		ErrorCode        string `json:"error_code"`         // 查询到的订单状态为FAIL失败或REFUND退票时，返回错误代码
-		FailReason       string `json:"fail_reason"`        // 查询到的订单状态为FAIL失败或REFUND退票时，返回具体的原因。
-		DeductBillInfo   string `json:"deduct_bill_info"`   // 商户查询代扣订单信息时返回其在代扣请求中传入的账单属性
-		TransferBillInfo string `json:"transfer_bill_info"` // 商户在查询代发订单信息时返回其在代发请求中传入的账单属性。
-	} `json:"alipay_fund_trans_common_query_response"`
-	Sign string `json:"sign"`
-}
-
-func (this *FundTransCommonQueryRsp) IsSuccess() bool {
-	if this.Content.Code == CodeSuccess {
-		return true
-	}
-	return false
-}
-
-// FundAccountQuery 支付宝资金账户资产查询接口请求参数  https://docs.open.alipay.com/api_28/alipay.fund.account.query
-type FundAccountQuery struct {
-	AppAuthToken       string `json:"-"`                    // 可选
-	AliPayUserId       string `json:"alipay_user_id"`       // 必选 蚂蚁统一会员ID
-	MerchantUserId     string `json:"merchant_user_id"`     // 特殊可选 商户会员的唯一标识。如果传入的user_id为虚拟账户userId，此字段必传并比对一致性。
-	AccountProductCode string `json:"account_product_code"` // 特殊可选 开户产品码。如果查询托管子户余额，必传且必须传入与开户时传入的值一致。
-	AccountType        string `json:"account_type"`         // 特殊可选 查询的账号类型，如查询托管账户值为TRUSTEESHIP_ACCOUNT，查询余额账户值为ACCTRANS_ACCOUNT。查询余额账户时必填。
-	AccountSceneCode   string `json:"account_scene_code"`   // 特殊可选 开户场景码，与开户产品码不可同时传递。
-	ExtInfo            string `json:"ext_info"`             // 可选 	JSON格式，传递业务扩展参数。
-}
-
-func (this FundAccountQuery) APIName() string {
-	return "alipay.fund.account.query"
-}
-
-func (this FundAccountQuery) Params() map[string]string {
-	var m = make(map[string]string)
-	m["app_auth_token"] = this.AppAuthToken
-	return m
-}
-
-// FundAccountQueryRsp 支付宝资金账户资产查询接口响应参数
-type FundAccountQueryRsp struct {
-	Content struct {
-		Code            Code   `json:"code"`
-		Msg             string `json:"msg"`
-		SubCode         string `json:"sub_code"`
-		SubMsg          string `json:"sub_msg"`
-		AvailableAmount string `json:"available_amount"`
-		ExtCardInfo     struct {
-			CardNo       string `json:"card_no"`
-			BankAccName  string `json:"bank_acc_name"`
-			CardBranch   string `json:"card_branch"`
-			CardBank     string `json:"card_bank"`
-			CardLocation string `json:"card_location"`
-			CardDeposit  string `json:"card_deposit"`
-			Status       string `json:"status"`
-		}
-	} `json:"alipay_fund_account_query_response"`
-	Sign string `json:"sign"`
-}
-
-func (this *FundAccountQueryRsp) IsSuccess() bool {
-	if this.Content.Code == CodeSuccess {
-		return true
-	}
-	return false
 }

@@ -1,6 +1,7 @@
 package alipay
 
-// TradeWapPay 手机网站支付接口请求参数 https://docs.open.alipay.com/api_1/alipay.trade.wap.pay/
+// --------------------------------------------------------------------------------
+// https://docs.open.alipay.com/api_1/alipay.trade.wap.pay/
 type TradeWapPay struct {
 	Trade
 	QuitURL    string `json:"quit_url,omitempty"`
@@ -14,7 +15,6 @@ func (this TradeWapPay) APIName() string {
 
 func (this TradeWapPay) Params() map[string]string {
 	var m = make(map[string]string)
-	m["app_auth_token"] = this.AppAuthToken
 	m["notify_url"] = this.NotifyURL
 	m["return_url"] = this.ReturnURL
 	return m
